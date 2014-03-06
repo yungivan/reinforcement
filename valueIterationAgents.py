@@ -46,12 +46,42 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
+        self.allstates = self.mdp.getStates()
 
+        #print self.allstates
+        #state = self.mdp.getStartState()
+        #maxq = float('-inf')
+        
+        #self.valuesupdate = self.values
+
+        for i in range(0, iterations): 
+            self.valuesupdate = self.values.copy()
+            #print "iter~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~%s" % i
+            for state in self.allstates:
+                actions = self.mdp.getPossibleActions(state)
+                maxq = float('-inf')
+                if self.mdp.isTerminal(state):
+                    #print "TERMINAL STATE ~~~~~~~~~~~~~"
+                    #print actions
+                    maxq = 0
+                else:
+                    for action in actions:
+                        temp = self.getQValue(state,action)
+                        maxq = max(temp, maxq)
+                self.valuesupdate[state] = maxq
+                #print "State updated~~~~%s, %s" % (state, maxq)
+                #print "state~~~~~ maxq~~~~~"
+                #print state, maxq
+            #print "value: %s" % self.values
+            #print "valueupdate: %s" % self.valuesupdate
+            self.values = self.valuesupdate
+        self.getPolicy(state)
 
     def getValue(self, state):
         """
           Return the value of the state (computed in __init__).
         """
+        #print "state: %s, value: %s" % (state, self.values[state])
         return self.values[state]
 
 
@@ -61,7 +91,20 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        #util.raiseNotDefined()
+        total = 0
+        #actions = self.mdp.getPossibleActions(state)
+        #for action in actions:
+        transtate = self.mdp.getTransitionStatesAndProbs(state,action)
+        for nextstate,nextprob in transtate:
+            #print nextstate, nextprob
+            reward = self.mdp.getReward(state, action, nextstate)
+            #print "nextprob: %s, reward: %s, getValue: %s" % (nextprob, reward, self.getValue(nextstate))
+            temp = nextprob * (reward + (self.discount * self.getValue(nextstate)))
+            #print "temp added to total: %s" % temp
+            total += temp
+        #print "state: %s, action:%s, total: %s" % (state, action, total)
+        return total
 
     def computeActionFromValues(self, state):
         """
@@ -73,7 +116,11 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        #util.raiseNotDefined()
+        #print "getting acitons... "
+        
+        return
+        
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
